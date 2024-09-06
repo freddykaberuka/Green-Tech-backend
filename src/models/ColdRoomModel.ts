@@ -26,9 +26,40 @@ export const getColdRoomById = async (id: number): Promise<ColdRoom | null> => {
 };
 
 export const updateColdRoom = async (id: number, coldRoom: Partial<ColdRoom>): Promise<void> => {
-    const query = `UPDATE cold_rooms SET name = ?, location = ?, capacity = ?, status = ? WHERE id = ?`;
-    await pool.execute(query, [coldRoom.name, coldRoom.location, coldRoom.capacity, coldRoom.status, id]);
+    try {
+        const fields = [];
+        const values = [];
+
+        if (coldRoom.name !== undefined) {
+            fields.push('name = ?');
+            values.push(coldRoom.name);
+        }
+        if (coldRoom.location !== undefined) {
+            fields.push('location = ?');
+            values.push(coldRoom.location);
+        }
+        if (coldRoom.capacity !== undefined) {
+            fields.push('capacity = ?');
+            values.push(coldRoom.capacity);
+        }
+        if (coldRoom.status !== undefined) {
+            fields.push('status = ?');
+            values.push(coldRoom.status);
+        }
+        values.push(id);
+        if (fields.length === 0) {
+            throw new Error('No fields provided to update');
+        }
+        const query = `UPDATE cold_rooms SET ${fields.join(', ')} WHERE id = ?`;
+
+        await pool.execute(query, values);
+        console.log(`ColdRoom with id ${id} updated`);
+    } catch (error) {
+        console.error('Error updating cold room:', error);
+        throw error;
+    }
 };
+
 
 export const deleteColdRoom = async (id: number): Promise<void> => {
     await pool.execute('DELETE FROM cold_rooms WHERE id = ?', [id]);
