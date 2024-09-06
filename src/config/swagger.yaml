@@ -1,0 +1,174 @@
+openapi: 3.0.0
+info:
+  title: ColdRoom API
+  description: API for managing ColdRooms, including creating, updating, fetching, and deleting cold rooms.
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000/
+    description: Local development server
+tags:
+  - name: ColdRooms
+    description: API for managing ColdRooms
+paths:
+  /coldroom:
+    get:
+      summary: Get all ColdRooms
+      tags:
+        - ColdRooms
+      responses:
+        '200':
+          description: A list of ColdRooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ColdRoom'
+        '500':
+          description: Server error
+    post:
+      summary: Create a new ColdRoom
+      tags:
+        - ColdRooms
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ColdRoomInput'
+      responses:
+        '201':
+          description: ColdRoom created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ColdRoom'
+        '400':
+          description: Invalid input
+        '500':
+          description: Server error
+
+  /coldroom/{id}:
+    get:
+      summary: Get ColdRoom by ID
+      tags:
+        - ColdRooms
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ColdRoom ID
+      responses:
+        '200':
+          description: A single ColdRoom
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ColdRoom'
+        '404':
+          description: ColdRoom not found
+        '500':
+          description: Server error
+    put:
+      summary: Update an existing ColdRoom
+      tags:
+        - ColdRooms
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ColdRoom ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ColdRoomInput'
+      responses:
+        '200':
+          description: ColdRoom updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ColdRoom'
+        '400':
+          description: Invalid input
+        '404':
+          description: ColdRoom not found
+        '500':
+          description: Server error
+    delete:
+      summary: Delete a ColdRoom
+      tags:
+        - ColdRooms
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ColdRoom ID
+      responses:
+        '204':
+          description: ColdRoom deleted successfully
+        '404':
+          description: ColdRoom not found
+        '500':
+          description: Server error
+
+components:
+  schemas:
+    ColdRoom:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Auto-generated ID of the ColdRoom
+        name:
+          type: string
+          description: Name of the ColdRoom
+        location:
+          type: string
+          description: Location of the ColdRoom
+        capacity:
+          type: integer
+          description: Capacity of the ColdRoom
+        status:
+          type: string
+          description: Status of the ColdRoom (e.g., Available, In Use)
+      example:
+        id: 1
+        name: Main Cold Room
+        location: Building A, Floor 2
+        capacity: 50
+        status: Available
+
+    ColdRoomInput:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the ColdRoom
+        location:
+          type: string
+          description: Location of the ColdRoom
+        capacity:
+          type: integer
+          description: Capacity of the ColdRoom
+        status:
+          type: string
+          description: Status of the ColdRoom (e.g., Available, In Use)
+      required:
+        - name
+        - location
+        - capacity
+        - status
+      example:
+        name: Backup Cold Room
+        location: Building B, Floor 1
+        capacity: 30
+        status: In Use
