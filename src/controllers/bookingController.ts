@@ -1,46 +1,45 @@
+// controllers/bookingController.ts
 import { Request, Response } from 'express';
-import { Booking } from '../models/Booking';
-import { bookingService } from '../services/BookingService';
+import { CustomRequest } from '../types/customRequest';
+import { BookingService } from '../services/BookingService';
 
-export const createBooking = async (req: Request, res: Response) => {
-    const { coldRoomId, startTime, endTime } = req.body;
-    const userId = req.user?.id; // Ensure req.user exists
-  
+const bookingService = new BookingService();
+
+export class BookingController {
+  async requestBooking(req: CustomRequest, res: Response) {
     try {
-      const newBooking: Omit<Booking, 'id'> = {
-        userId,
-        coldRoomId,
-        startTime: new Date(startTime), // Ensure it's a Date
-        endTime: new Date(endTime),     // Ensure it's a Date
-      };
-  
-      const booking = await bookingService.createBooking(newBooking);
-      res.status(201).json(booking);
+      const { coldRoomId } = req.body;
+      const userId = req.user?.id;
+      if (!userId) return res.status(403).json({ message: 'Unauthorized' });
+
+      const bookingId = await bookingService.requestBooking(userId, coldRoomId);
+      res.status(201).json({ message: 'Booking request submitted', id: bookingId });
     } catch (error) {
-      res.status(500).json({ message: 'Error creating booking', error });
+      res.status(500).json({ error: 'Failed to submit booking request' });
     }
-  };
-
-export const getBookings = async (req: Request, res: Response) => {
-  try {
-    const bookings = await bookingService.getAllBookings();
-    res.json(bookings);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching bookings', error });
   }
-};
 
-export const updateBookingStatus = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const { status } = req.body; // 'Approved' or 'Rejected'
+  async updateBookingStatus(req: CustomRequest, res: Response) {
+    try {
+      const { id, status } = req.body;
+      if (req.user?.role !== 'admin') return res.status(403).json({ message: 'Forbidden' });
 
-  try {
-    const updatedBooking = await bookingService.updateBookingStatus(Number(id), status);
-    if (!updatedBooking) {
-      return res.status(404).json({ message: 'Booking not found' });
+      await bookingService.approveBooking(id, status);
+      res.status(200).json({ message: `Booking ${status}` });
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to update booking status' });
     }
-    res.json(updatedBooking);
-  } catch (error) {
-    res.status(500).json({ message: 'Error updating booking status', error });
   }
-};
+
+  async getUserBookings(req: CustomRequest, res: Response) {
+    try {
+      const userId = req.user?.id;
+      if (!userId) return res.status(403).json({ message: 'Unauthorized' });
+
+      const bookings = await bookingService.getUserBookings(userId);
+      res.status(200).json(bookings);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to retrieve bookings' });
+    }
+  }
+}

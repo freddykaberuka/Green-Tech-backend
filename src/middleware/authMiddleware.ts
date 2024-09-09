@@ -1,35 +1,28 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import { CustomRequest } from '../types/customRequest';
+import { JWTPayload } from '../types/jwtPayload';
 
 dotenv.config();
 
-export const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.header('Authorization')?.split(' ')[1];
+export const authenticateJWT = (req: CustomRequest, res: Response, next: NextFunction) => {
+  const authHeader = req.header('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Unauthorized, no token provided' });
+  }
+
+  const token = authHeader.split(' ')[1]; // Extract the token after "Bearer"
 
   if (token) {
-    jwt.verify(token, process.env.JWT_SECRET as string, (err, decoded: any) => {
+    jwt.verify(token, process.env.JWT_SECRET as string, (err, decoded) => {
       if (err) {
-        return res.status(403).send({ message: 'Forbidden: Invalid token' });
+        return res.status(403).json({ message: 'Forbidden, invalid token' });
       }
-
-      // Attach the decoded token (user) to the request object
-      req.user = {
-        id: decoded.id,
-        role: decoded.role, // Assuming JWT includes user role (admin/user)
-      };
+      req.user = decoded as JWTPayload;
       next();
     });
   } else {
-    res.status(401).send({ message: 'Unauthorized: Token missing' });
-  }
-};
-
-// Middleware to check if the user is an admin
-export const adminMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  if (req.user && req.user.role === 'admin') {
-    next();
-  } else {
-    res.status(403).send({ message: 'Access denied: Admins only' });
+    res.status(401).json({ message: 'Unauthorized, token missing' });
   }
 };

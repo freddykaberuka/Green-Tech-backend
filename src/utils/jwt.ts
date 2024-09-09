@@ -8,9 +8,9 @@ if (!secretKey) {
 
 export const generateToken = (userId: string, role: string): string => {
   return jwt.sign(
-    { userId, role },
+    { userId, role },  // Include userId and role in payload
     secretKey,
-    { expiresIn: '1d' }
+    { expiresIn: '1d' }  // Token expiration time
   );
 };
 

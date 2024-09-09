@@ -1,11 +1,13 @@
+// routes/bookingRoutes.ts
 import { Router } from 'express';
-import { createBooking, getBookings, updateBookingStatus } from '../controllers/bookingController';
-import { authenticateJWT, adminMiddleware } from '../middleware/authMiddleware';
+import { BookingController } from '../controllers/bookingController';
+import { authenticateJWT } from '../middleware/authMiddleware';
 
 const router = Router();
+const bookingController = new BookingController();
 
-router.post('/book', authenticateJWT, createBooking); // User can book a cold room
-router.get('/bookings', [authenticateJWT, adminMiddleware], getBookings); // Admin can see all bookings
-router.patch('/bookings/:id', [authenticateJWT, adminMiddleware], updateBookingStatus); // Admin can approve/reject a booking
+router.post('/', authenticateJWT, bookingController.requestBooking);  // User booking request
+router.put('/status', authenticateJWT, bookingController.updateBookingStatus);  // Admin updates status
+router.get('/list', authenticateJWT, bookingController.getUserBookings);  // Get user's bookings
 
 export default router;

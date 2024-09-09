@@ -4,6 +4,7 @@ export interface User {
   id: number;
   email: string;
   password: string;
+  role: 'admin'|'user';
 }
 
 export const findUserByEmail = async (email: string): Promise<User | null> => {
