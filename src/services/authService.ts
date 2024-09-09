@@ -7,7 +7,7 @@ export const register = async (email: string, password: string, role: string) =>
     throw new Error('User already exists');
   }
   const hashedPassword = await hashPassword(password);
-  await createUser(email, hashedPassword);
+  await createUser(email, hashedPassword, role);
 };
 
 export const login = async (email: string, password: string) => {

@@ -1,6 +1,7 @@
 export interface JWTPayload {
-    id: number;
-    email: string;
+    userId: number;  // Ensure this matches your userId
     role: 'admin' | 'user';
+    iat: number;
+    exp: number;
   }
   

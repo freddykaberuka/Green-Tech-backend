@@ -19,7 +19,7 @@ export const authenticateJWT = (req: CustomRequest, res: Response, next: NextFun
       if (err) {
         return res.status(403).json({ message: 'Forbidden, invalid token' });
       }
-      req.user = decoded as JWTPayload;
+      req.user = decoded as JWTPayload;  // Cast the decoded token to JWTPayload
       next();
     });
   } else {

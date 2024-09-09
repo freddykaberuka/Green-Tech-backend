@@ -15,6 +15,6 @@ export const findUserByEmail = async (email: string): Promise<User | null> => {
   return null;
 };
 
-export const createUser = async (email: string, hashedPassword: string): Promise<void> => {
-  await pool.query('INSERT INTO users (email, password) VALUES (?, ?)', [email, hashedPassword]);
+export const createUser = async (email: string, hashedPassword: string, role: string): Promise<void> => {
+  await pool.query('INSERT INTO users (email, password, role) VALUES (?, ?, ?)', [email, hashedPassword, role]);
 };
