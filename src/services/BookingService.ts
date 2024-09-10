@@ -1,5 +1,4 @@
-// services/bookingService.ts
-import { Booking, createBooking, updateBookingStatus, getBookingsByUserId } from '../models/Booking';
+import { Booking, createBooking, updateBookingStatus, getBookingsByUserId, getBookingById, cancelBooking, getAllBookings, getPendingBookings } from '../models/Booking';
 
 export class BookingService {
   async requestBooking(userId: number, coldRoomId: number): Promise<number> {
@@ -18,5 +17,21 @@ export class BookingService {
 
   async getUserBookings(userId: number): Promise<Booking[]> {
     return getBookingsByUserId(userId);
+  }
+
+  async getAllBookings(): Promise<Booking[]> {
+    return getAllBookings();
+  }
+
+  async getBookingById(id: number): Promise<Booking | null> {
+    return getBookingById(id);
+  }
+
+  async cancelBooking(id: number): Promise<void> {
+    return cancelBooking(id);
+  }
+
+  async getPendingBookings(): Promise<Booking[]> {
+    return getPendingBookings();
   }
 }

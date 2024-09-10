@@ -41,4 +41,77 @@ export class BookingController {
       res.status(500).json({ error: 'Failed to retrieve bookings' });
     }
   }
+
+  async getAllBookings(req: CustomRequest, res: Response) {
+    try {
+      if (req.user?.role !== 'admin') return res.status(403).json({ message: 'Forbidden, admin access required' });
+  
+      const bookings = await bookingService.getAllBookings();
+      res.status(200).json(bookings);
+    } catch (error) {
+      console.error('Error retrieving all bookings:', error); // Log the error
+      res.status(500).json({ error: 'Failed to retrieve bookings' });
+    }
+  }
+
+  async getBookingDetails(req: CustomRequest, res: Response) {
+    try {
+      const { id } = req.params;
+      const userId = req.user?.userId;
+  
+      // Check if id is a valid number
+      const bookingId = Number(id);
+      if (isNaN(bookingId)) {
+        return res.status(400).json({ message: 'Invalid booking ID' });
+      }
+  
+      const booking = await bookingService.getBookingById(bookingId);
+  
+      if (!booking) return res.status(404).json({ message: 'Booking not found' });
+  
+      if (booking.userId !== userId && req.user?.role !== 'admin') {
+        return res.status(403).json({ message: 'Forbidden, you are not authorized to view this booking' });
+      }
+  
+      res.status(200).json(booking);
+    } catch (error) {
+      console.error('Error retrieving booking details:', error); // Log the error
+      res.status(500).json({ error: 'Failed to retrieve booking details' });
+    }
+  }
+  
+
+  async cancelBooking(req: CustomRequest, res: Response) {
+    try {
+      const { id } = req.params;
+      const userId = req.user?.userId;
+  
+      const booking = await bookingService.getBookingById(Number(id));
+  
+      if (!booking) return res.status(404).json({ message: 'Booking not found' });
+  
+      if (booking.userId !== userId) {
+        return res.status(403).json({ message: 'Forbidden, you are not authorized to cancel this booking' });
+      }
+  
+      await bookingService.cancelBooking(Number(id));
+      res.status(200).json({ message: 'Booking cancelled successfully' });
+    } catch (error) {
+      console.error('Error cancelling booking:', error); // Log the error
+      res.status(500).json({ error: 'Failed to cancel booking' });
+    }
+  }
+  
+  async getPendingBookings(req: CustomRequest, res: Response) {
+    try {
+      if (req.user?.role !== 'admin') return res.status(403).json({ message: 'Forbidden, admin access required' });
+  
+      const bookings = await bookingService.getPendingBookings();
+      res.status(200).json(bookings);
+    } catch (error) {
+      res.status(500).json({ error: 'Failed to retrieve pending bookings' });
+    }
+  }
+  
+  
 }
