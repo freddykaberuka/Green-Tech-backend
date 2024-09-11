@@ -3,14 +3,16 @@ import pool from '../config/db';
 export interface ColdRoom {
     id?: number;
     name: string;
+    price: string;
     location: string;
     capacity: number;
     status: string;
+    unit: string;
 }
 
 export const createColdRoom = async (coldRoom: ColdRoom): Promise<number> => {
-    const query = `INSERT INTO cold_rooms (name, location, capacity, status) VALUES (?, ?, ?, ?)`;
-    const [result] = await pool.execute(query, [coldRoom.name, coldRoom.location, coldRoom.capacity, coldRoom.status]);
+    const query = `INSERT INTO cold_rooms (name, price, location, capacity, unit, status) VALUES (?, ?, ?, ?, ?, ?)`;
+    const [result] = await pool.execute(query, [coldRoom.name, coldRoom.price, coldRoom.location, coldRoom.capacity, coldRoom.unit, coldRoom.status]);
     return (result as any).insertId;
 };
 
@@ -34,6 +36,10 @@ export const updateColdRoom = async (id: number, coldRoom: Partial<ColdRoom>): P
             fields.push('name = ?');
             values.push(coldRoom.name);
         }
+        if (coldRoom.price !== undefined) {
+            fields.push('price = ?');
+            values.push(coldRoom.price);
+        }
         if (coldRoom.location !== undefined) {
             fields.push('location = ?');
             values.push(coldRoom.location);
@@ -45,6 +51,10 @@ export const updateColdRoom = async (id: number, coldRoom: Partial<ColdRoom>): P
         if (coldRoom.status !== undefined) {
             fields.push('status = ?');
             values.push(coldRoom.status);
+        }
+        if (coldRoom.unit !== undefined) {
+            fields.push('unit = ?');
+            values.push(coldRoom.unit);
         }
         values.push(id);
         if (fields.length === 0) {

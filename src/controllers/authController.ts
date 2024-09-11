@@ -29,9 +29,11 @@ function isError(error: unknown): error is Error {
       const token = generateToken(user.id.toString(), user.role);
   
       res.status(200).send({
+        
         message: 'User logged in successfully',
         token,
       });
+      console.log('user logged in');
     } catch (error) {
       if (isError(error)) {
         res.status(400).send({ error: error.message });

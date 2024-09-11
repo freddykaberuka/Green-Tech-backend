@@ -4,6 +4,7 @@ import coldroomRoutes from './routes/coldroomRoutes';
 import bookingRoutes from './routes/bookingRoutes';
 import { setupSwagger } from './swagger';
 import dotenv from 'dotenv';
+import cors from "cors";
 
 dotenv.config();
 
@@ -11,6 +12,11 @@ const app = express();
 setupSwagger(app);
 
 app.use(express.json());
+app.use(cors({
+    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    methods: 'GET,POST,PUT,DELETE',
+    allowedHeaders: 'Content-Type,Authorization'
+  }));
 
 app.use('/api/auth', authRoutes);
 app.use('/coldroom', coldroomRoutes)
