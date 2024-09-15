@@ -42,5 +42,18 @@ function isError(error: unknown): error is Error {
       }
     }
   };
+
+  export const logoutUser = async (req: Request, res: Response) => {
+    try {
+      // Clear the token from the response or simulate invalidation
+      res.status(200).send({ message: 'User logged out successfully' });
+    } catch (error) {
+      if (isError(error)) {
+        res.status(400).send({ error: error.message });
+      } else {
+        res.status(400).send({ error: 'Unknown error occurred' });
+      }
+    }
+  };
   
   
