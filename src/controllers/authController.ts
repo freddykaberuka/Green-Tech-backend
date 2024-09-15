@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { register, login } from '../services/authService';
+import { register, login, requestPasswordReset, resetPassword } from '../services/authService';
 import { Roles } from '../utils/roles';
 import { generateToken } from '../utils/jwt';
 
@@ -43,10 +43,12 @@ function isError(error: unknown): error is Error {
     }
   };
 
-  export const logoutUser = async (req: Request, res: Response) => {
+  export const requestPasswordResetController = async (req: Request, res: Response) => {
+    const { email } = req.body;
+  
     try {
-      // Clear the token from the response or simulate invalidation
-      res.status(200).send({ message: 'User logged out successfully' });
+      await requestPasswordReset(email);
+      res.status(200).send({ message: 'Password reset link has been sent to your email' });
     } catch (error) {
       if (isError(error)) {
         res.status(400).send({ error: error.message });
@@ -55,5 +57,33 @@ function isError(error: unknown): error is Error {
       }
     }
   };
+
+  export const resetPasswordController = async (req: Request, res: Response) => {
+    const { token, newPassword } = req.body;
+  
+    try {
+      await resetPassword(token, newPassword);
+      res.status(200).send({ message: 'Password reset successful' });
+    } catch (error) {
+      if (isError(error)) {
+        res.status(400).send({ error: error.message });
+      } else {
+        res.status(400).send({ error: 'Unknown error occurred' });
+      }
+    }
+  };
+
+  export const logoutUser = (req: Request, res: Response) => {
+    try {
+      // Invalidate token on the frontend
+      res.status(200).send({ message: 'User logged out successfully' });
+    } catch (error) {
+      if (isError(error)) {
+        res.status(400).send({ error: error.message });
+      } else {
+        res.status(400).send({ error: 'Unknown error occurred' });
+      }
+    }
+  };  
   
   
