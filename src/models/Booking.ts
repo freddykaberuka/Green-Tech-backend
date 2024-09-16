@@ -9,16 +9,20 @@ export interface Booking {
   status: 'pending' | 'approved' | 'rejected';
   requestedAt: Date;
   approvedAt?: Date;
+  startDate: Date;
+  endDate: Date; 
 }
 
 // Create a booking
 export const createBooking = async (booking: Booking): Promise<number> => {
-  const query = `INSERT INTO bookings (userId, coldRoomId, status, requestedAt) VALUES (?, ?, ?, ?)`;
+  const query = `INSERT INTO bookings (userId, coldRoomId, status, requestedAt, startDate, endDate) VALUES (?, ?, ?, ?, ?,?)`;
   const [result] = await pool.execute<ResultSetHeader>(query, [
     booking.userId,
     booking.coldRoomId,
     booking.status,
     booking.requestedAt,
+    booking.startDate,
+    booking.endDate
   ]);
   return result.insertId;
 };
@@ -62,3 +66,29 @@ export const getPendingBookings = async (): Promise<Booking[]> => {
   const [rows] = await pool.query<RowDataPacket[]>(query);
   return rows as Booking[];
 };
+
+export const checkDateAvailability = async (coldRoomId: number, startDate: Date, endDate: Date): Promise<boolean> => {
+    // Format dates as strings to match SQL date format
+    const startDateStr = startDate.toISOString().slice(0, 19).replace('T', ' ');
+    const endDateStr = endDate.toISOString().slice(0, 19).replace('T', ' ');
+  
+    const query = `
+      SELECT * FROM bookings
+      WHERE coldRoomId = ? 
+        AND status = 'approved'
+        AND (
+          (startDate <= ? AND endDate >= ?) OR  
+          (startDate <= ? AND endDate >= ?) OR  
+          (startDate >= ? AND endDate <= ?)     
+        )
+    `;
+    const [rows] = await pool.query<RowDataPacket[]>(query, [
+      coldRoomId, startDateStr, startDateStr, endDateStr, endDateStr, startDateStr, endDateStr
+    ]);
+    
+    return rows.length === 0;  
+  };
+  
+
+  
+  

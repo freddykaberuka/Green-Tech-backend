@@ -4,19 +4,36 @@ import { BookingService } from '../services/BookingService';
 
 const bookingService = new BookingService();
 
-export class BookingController {
-  async requestBooking(req: CustomRequest, res: Response) {
-    try {
-      const { coldRoomId } = req.body;
-      const userId = req.user?.userId;  // Access userId instead of id
-      if (!userId) return res.status(403).json({ message: 'Unauthorized, user ID missing' });
+// bookingController.ts
 
-      const bookingId = await bookingService.requestBooking(userId, coldRoomId);
+export class BookingController {
+async requestBooking(req: CustomRequest, res: Response) {
+    try {
+      const { coldRoomId, startDate, endDate } = req.body;
+      const userId = req.user?.userId;
+  
+      if (!userId) return res.status(403).json({ message: 'Unauthorized, user ID missing' });
+  
+      // Parse the startDate and endDate to Date objects
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+  
+      // Ensure the dates are valid
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return res.status(400).json({ message: 'Invalid date format' });
+      }
+  
+      console.log('Requested Dates:', { startDate: start.toISOString(), endDate: end.toISOString() });
+  
+      const bookingId = await bookingService.requestBooking(userId, coldRoomId, start, end);
       res.status(201).json({ message: 'Booking request submitted', id: bookingId });
     } catch (error) {
+      console.error('Error submitting booking request:', error); // Log the error
       res.status(500).json({ error: 'Failed to submit booking request' });
     }
   }
+  
+  
 
   async updateBookingStatus(req: CustomRequest, res: Response) {
     try {
@@ -110,6 +127,29 @@ export class BookingController {
       res.status(200).json(bookings);
     } catch (error) {
       res.status(500).json({ error: 'Failed to retrieve pending bookings' });
+    }
+  }
+
+  async checkAvailability(req: CustomRequest, res: Response) {
+    try {
+      const { coldRoomId, startDate, endDate } = req.body;
+
+      // Validate the request body
+      if (!coldRoomId || !startDate || !endDate) {
+        return res.status(400).json({ message: 'coldRoomId, startDate, and endDate are required' });
+      }
+
+      // Check if the cold room is available in the given date range
+      const isAvailable = await bookingService.checkDateAvailability(coldRoomId, new Date(startDate), new Date(endDate));
+
+      if (isAvailable) {
+        res.status(200).json({ message: 'Cold room is available' });
+      } else {
+        res.status(409).json({ message: 'Cold room is not available for the selected dates' });
+      }
+    } catch (error) {
+      console.error('Error checking availability:', error);
+      res.status(500).json({ error: 'Failed to check availability' });
     }
   }
   

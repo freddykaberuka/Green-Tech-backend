@@ -9,6 +9,7 @@ router.post('/', authenticateJWT, bookingController.requestBooking);  // User bo
 router.put('/status', authenticateJWT, bookingController.updateBookingStatus);  // Admin updates status
 router.get('/list', authenticateJWT, bookingController.getUserBookings);  // Get user's bookings
 router.get('/pending', authenticateJWT, bookingController.getPendingBookings);  // Admin gets pending bookings
+router.post('/availability', authenticateJWT, bookingController.checkAvailability); 
 router.get('/', authenticateJWT, bookingController.getAllBookings);  // Admin gets all bookings
 router.get('/:id', authenticateJWT, bookingController.getBookingDetails);  // Get booking details by ID
 router.delete('/:id', authenticateJWT, bookingController.cancelBooking);  // User cancels booking

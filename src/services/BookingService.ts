@@ -1,12 +1,15 @@
-import { Booking, createBooking, updateBookingStatus, getBookingsByUserId, getBookingById, cancelBooking, getAllBookings, getPendingBookings } from '../models/Booking';
+import { Booking, createBooking, updateBookingStatus, getBookingsByUserId, getBookingById, cancelBooking, getAllBookings, getPendingBookings, checkDateAvailability } from '../models/Booking';
 
 export class BookingService {
-  async requestBooking(userId: number, coldRoomId: number): Promise<number> {
+  async requestBooking(userId: number, coldRoomId: number, startDate: Date, endDate: Date): Promise<number> {
+    console.log('Requested Dates:', { startDate, endDate });
     const bookingId = await createBooking({
       userId,
       coldRoomId,
       status: 'pending',
       requestedAt: new Date(),
+      startDate,
+      endDate,
     });
     return bookingId;
   }
@@ -33,5 +36,9 @@ export class BookingService {
 
   async getPendingBookings(): Promise<Booking[]> {
     return getPendingBookings();
+  }
+
+  async checkDateAvailability(coldRoomId: number, startDate: Date, endDate: Date): Promise<boolean> {
+    return checkDateAvailability(coldRoomId, startDate, endDate);
   }
 }
