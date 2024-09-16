@@ -68,26 +68,30 @@ export const getPendingBookings = async (): Promise<Booking[]> => {
 };
 
 export const checkDateAvailability = async (coldRoomId: number, startDate: Date, endDate: Date): Promise<boolean> => {
-    // Format dates as strings to match SQL date format
+    // Convert dates to proper SQL format
     const startDateStr = startDate.toISOString().slice(0, 19).replace('T', ' ');
     const endDateStr = endDate.toISOString().slice(0, 19).replace('T', ' ');
   
     const query = `
       SELECT * FROM bookings
-      WHERE coldRoomId = ? 
-        AND status = 'approved'
-        AND (
-          (startDate <= ? AND endDate >= ?) OR  
-          (startDate <= ? AND endDate >= ?) OR  
-          (startDate >= ? AND endDate <= ?)     
-        )
+      WHERE coldRoomId = ?
+      AND status = 'approved'
+      AND (
+        (startDate <= ? AND endDate >= ?) OR  -- Booking overlaps with the start of the requested range
+        (startDate <= ? AND endDate >= ?) OR  -- Booking overlaps with the end of the requested range
+        (startDate >= ? AND endDate <= ?)     -- Booking is fully within the requested range
+      )
     `;
+    
     const [rows] = await pool.query<RowDataPacket[]>(query, [
       coldRoomId, startDateStr, startDateStr, endDateStr, endDateStr, startDateStr, endDateStr
     ]);
-    
-    return rows.length === 0;  
+  
+    console.log('Date check result:', rows); // Debugging log
+  
+    return rows.length === 0;  // If no conflicting bookings, room is available
   };
+  
   
 
   

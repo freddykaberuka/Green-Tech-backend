@@ -133,15 +133,24 @@ async requestBooking(req: CustomRequest, res: Response) {
   async checkAvailability(req: CustomRequest, res: Response) {
     try {
       const { coldRoomId, startDate, endDate } = req.body;
-
-      // Validate the request body
+  
       if (!coldRoomId || !startDate || !endDate) {
         return res.status(400).json({ message: 'coldRoomId, startDate, and endDate are required' });
       }
-
-      // Check if the cold room is available in the given date range
-      const isAvailable = await bookingService.checkDateAvailability(coldRoomId, new Date(startDate), new Date(endDate));
-
+  
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+  
+      // Ensure the dates are valid
+      if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+        return res.status(400).json({ message: 'Invalid date format' });
+      }
+  
+      // Debug logs
+      console.log('Checking availability for:', { coldRoomId, startDate: start, endDate: end });
+  
+      const isAvailable = await bookingService.checkDateAvailability(coldRoomId, start, end);
+  
       if (isAvailable) {
         res.status(200).json({ message: 'Cold room is available' });
       } else {
@@ -152,6 +161,5 @@ async requestBooking(req: CustomRequest, res: Response) {
       res.status(500).json({ error: 'Failed to check availability' });
     }
   }
-  
   
 }
