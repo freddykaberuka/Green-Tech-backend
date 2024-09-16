@@ -4,16 +4,16 @@ import { generateToken } from '../utils/jwt';
 import { sendResetEmail } from '../utils/email';
 import crypto from 'crypto'
 
-export const register = async (email: string, password: string, role: string) => {
+export const register = async (names: string, email: string, password: string, role: string) => {
   const user = await findUserByEmail(email);
   if (user) {
     throw new Error('User already exists');
   }
   const hashedPassword = await hashPassword(password);
-  await createUser(email, hashedPassword, role);
+  await createUser(names, email, hashedPassword, role);
 };
 
-export const login = async (email: string, password: string) => {
+export const login = async (names: string, email: string, password: string) => {
     const user = await findUserByEmail(email);
     if (!user) {
       throw new Error('User not found');

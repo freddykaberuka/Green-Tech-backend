@@ -6,11 +6,11 @@ if (!secretKey) {
   throw new Error('JWT_SECRET environment variable is not set');
 }
 
-export const generateToken = (userId: string, role: string): string => {
+export const generateToken = (userId: string, names: string, email: string, role: string): string => {
   return jwt.sign(
-    { userId, role },  // Include userId and role in payload
+    { userId, names, email, role },
     secretKey,
-    { expiresIn: '1d' }  // Token expiration time
+    { expiresIn: '1d' }
   );
 };
 

@@ -2,6 +2,7 @@ import pool from '../config/db';
 
 export interface User {
   id: number;
+  names: string;
   email: string;
   password: string;
   role: 'admin'|'user';
@@ -15,8 +16,8 @@ export const findUserByEmail = async (email: string): Promise<User | null> => {
   return null;
 };
 
-export const createUser = async (email: string, hashedPassword: string, role: string): Promise<void> => {
-  await pool.query('INSERT INTO users (email, password, role) VALUES (?, ?, ?)', [email, hashedPassword, role]);
+export const createUser = async (names: string, email: string, hashedPassword: string, role: string): Promise<void> => {
+  await pool.query('INSERT INTO users (names, email, password, role) VALUES (?, ?, ?, ?)', [names, email, hashedPassword, role]);
 };
 
 export const storePasswordResetToken = async (userId: number, token: string) => {
