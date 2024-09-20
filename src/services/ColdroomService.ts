@@ -2,22 +2,47 @@ import { createColdRoom, getColdRooms, getColdRoomById, updateColdRoom, deleteCo
 
 export class ColdRoomService {
     async createColdRoom(coldRoomData: ColdRoom): Promise<number> {
-        return await createColdRoom(coldRoomData);
+        try {
+            return await createColdRoom(coldRoomData);
+        } catch (error) {
+            console.error('Error in ColdRoomService.createColdRoom:', error);
+            throw error;
+        }
     }
 
     async getColdRooms(): Promise<ColdRoom[]> {
-        return await getColdRooms();
+        try {
+            return await getColdRooms();
+        } catch (error) {
+            console.error('Error in ColdRoomService.getColdRooms:', error);
+            throw error;
+        }
     }
 
     async getColdRoomById(id: number): Promise<ColdRoom | null> {
-        return await getColdRoomById(id);
+        try {
+            return await getColdRoomById(id);
+        } catch (error) {
+            console.error('Error in ColdRoomService.getColdRoomById:', error);
+            throw error;
+        }
     }
 
     async updateColdRoom(id: number, coldRoomData: Partial<ColdRoom>): Promise<void> {
-        await updateColdRoom(id, coldRoomData);
+        try {
+            await updateColdRoom(id, coldRoomData);
+        } catch (error) {
+            console.error('Error in ColdRoomService.updateColdRoom:', error);
+            throw error;
+        }
     }
 
     async deleteColdRoom(id: number): Promise<void> {
-        await deleteColdRoom(id);
+        try {
+            await deleteColdRoom(id);
+        } catch (error) {
+            console.error('Error in ColdRoomService.deleteColdRoom:', error);
+            throw error;
+        }
     }
 }
