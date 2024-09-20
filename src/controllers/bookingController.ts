@@ -144,9 +144,6 @@ async requestBooking(req: CustomRequest, res: Response) {
         return res.status(400).json({ message: 'Invalid date format' });
       }
   
-      // Debug logs
-      console.log('Checking availability for:', { coldRoomId, startDate: start, endDate: end });
-  
       const isAvailable = await bookingService.checkDateAvailability(coldRoomId, start, end);
   
       if (isAvailable) {
@@ -158,6 +155,5 @@ async requestBooking(req: CustomRequest, res: Response) {
       console.error('Error checking availability:', error);
       res.status(500).json({ error: 'Failed to check availability' });
     }
-  }
-  
+  } 
 }
