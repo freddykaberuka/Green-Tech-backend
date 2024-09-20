@@ -22,7 +22,7 @@ export class BookingService {
     return getBookingsByUserId(userId);
   }
 
-  async getAllBookings(): Promise<Booking[]> {
+  async getAllBookings(): Promise<any[]> {
     return getAllBookings();
   }
 

@@ -53,12 +53,31 @@ export const cancelBooking = async (id: number): Promise<void> => {
   await pool.execute(query, [id]);
 };
 
-// Get all bookings
-export const getAllBookings = async (): Promise<Booking[]> => {
-  const query = `SELECT * FROM bookings`;
+// Get all bookings with coldroom and user information
+export const getAllBookings = async (): Promise<any[]> => {
+  const query = `
+    SELECT 
+      bookings.id AS bookingId,
+      bookings.status,
+      bookings.requestedAt,
+      bookings.approvedAt,
+      bookings.startDate,
+      bookings.endDate,
+      users.id AS userId,
+      users.names AS userName,
+      users.email AS userEmail,
+      cold_rooms.id AS coldRoomId,
+      cold_rooms.name AS coldRoomName,
+      cold_rooms.location AS coldRoomLocation
+    FROM bookings
+    JOIN users ON bookings.userId = users.id
+    JOIN cold_rooms ON bookings.coldRoomId = cold_rooms.id;
+  `;
+  
   const [rows] = await pool.query<RowDataPacket[]>(query);
-  return rows as Booking[];
+  return rows;
 };
+
 
 // Get pending bookings
 export const getPendingBookings = async (): Promise<Booking[]> => {
@@ -87,9 +106,9 @@ export const checkDateAvailability = async (coldRoomId: number, startDate: Date,
       coldRoomId, startDateStr, startDateStr, endDateStr, endDateStr, startDateStr, endDateStr
     ]);
   
-    console.log('Date check result:', rows); // Debugging log
+    console.log('Date check result:', rows);
   
-    return rows.length === 0;  // If no conflicting bookings, room is available
+    return rows.length === 0; 
   };
   
   

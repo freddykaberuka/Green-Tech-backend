@@ -4,8 +4,6 @@ import { BookingService } from '../services/BookingService';
 
 const bookingService = new BookingService();
 
-// bookingController.ts
-
 export class BookingController {
 async requestBooking(req: CustomRequest, res: Response) {
     try {
