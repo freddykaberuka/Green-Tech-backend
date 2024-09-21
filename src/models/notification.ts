@@ -13,7 +13,6 @@ export interface Notification {
 // CRUD Operations
 
 // Create a new notification
-// Create a new notification
 export const createNotification = async (data: Omit<Notification, 'id' | 'read'>): Promise<Notification> => {
     const { title, description, url, userId } = data;
     const [result] = await pool.query<any>(
