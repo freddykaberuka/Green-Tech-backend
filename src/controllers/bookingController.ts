@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { CustomRequest } from '../types/customRequest';
 import { BookingService } from '../services/BookingService';
+import { createNotificationController } from './notificationController';
 
 const bookingService = new BookingService();
 
@@ -24,12 +25,48 @@ async requestBooking(req: CustomRequest, res: Response) {
       console.log('Requested Dates:', { startDate: start.toISOString(), endDate: end.toISOString() });
   
       const bookingId = await bookingService.requestBooking(userId, coldRoomId, start, end);
+      const options: Intl.DateTimeFormatOptions = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    };
+    
+    const readableStart = start.toLocaleString('en-US', options);
+    const readableEnd = end.toLocaleString('en-US', options);
+      const notificationData = {
+        title: 'Booking Confirmed',
+        description: `Your booking for Cold Room ID ${coldRoomId} from ${readableStart} to ${readableEnd} has been confirmed.`,
+        url: `/bookings/${bookingId}`, // Link to the booking details page
+        userId,
+      };
+  
+      // Create mock request and response objects
+      const mockReq = {
+        body: notificationData,
+      } as Request;
+  
+      const mockRes = {
+        status: (code: number) => {
+          return {
+            send: (responseBody: any) => {
+              // You can log or handle the response if needed
+              console.log(`Response Status: ${code}`, responseBody);
+            },
+          };
+        },
+      } as Response;
+  
+      // Call the existing notification controller
+      await createNotificationController(mockReq, mockRes);
       res.status(201).json({ message: 'Booking request submitted', id: bookingId });
     } catch (error) {
       console.error('Error submitting booking request:', error); // Log the error
       res.status(500).json({ error: 'Failed to submit booking request' });
     }
   }
+
   
   
 
