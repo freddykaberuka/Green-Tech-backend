@@ -6,11 +6,20 @@ const coldRoomService = new ColdRoomService();
 export class ColdRoomController {
     async createColdRoom(req: Request, res: Response) {
         try {
-            const coldRoomId = await coldRoomService.createColdRoom(req.body);
+            const imageUrl = req.file?.path;
+            
+            const coldRoomData = {
+                ...req.body,
+                image: imageUrl
+            };
+
+            const coldRoomId = await coldRoomService.createColdRoom(coldRoomData);
             const newColdRoom = await coldRoomService.getColdRoomById(coldRoomId);
+
             if (!newColdRoom) {
                 return res.status(404).json({ error: 'Cold room not found after creation' });
             }
+
             res.status(201).json(newColdRoom);
         } catch (error: any) {
             console.error('Error creating cold room:', error.message);
@@ -22,8 +31,9 @@ export class ColdRoomController {
         try {
             const coldRooms = await coldRoomService.getColdRooms();
             res.status(200).json(coldRooms);
-        } catch (error) {
-            res.status(500).json({ error: 'Failed to retrieve cold rooms' });
+        } catch (error: any) {
+            console.error('Error retrieving cold rooms:', error.message);
+            res.status(500).json({ error: 'Failed to retrieve cold rooms', details: error.message });
         }
     }
 
@@ -41,14 +51,23 @@ export class ColdRoomController {
     async updateColdRoom(req: Request, res: Response) {
         try {
             const coldRoomId = parseInt(req.params.id, 10);
-            await coldRoomService.updateColdRoom(coldRoomId, req.body);
+            const imageUrl = req.file?.path;
+            
+            const coldRoomData = {
+                ...req.body,
+                image: imageUrl || req.body.image // Keep the old image URL if no new image is uploaded
+            };
+
+            await coldRoomService.updateColdRoom(coldRoomId, coldRoomData);
             const updatedColdRoom = await coldRoomService.getColdRoomById(coldRoomId);
+
             if (!updatedColdRoom) {
                 return res.status(404).json({ error: 'Cold room not found after update' });
             }
+
             res.status(200).json(updatedColdRoom);
-        } catch (error) {
-            res.status(500).json({ error: 'Failed to update cold room' });
+        } catch (error: any) {
+            res.status(500).json({ error: 'Failed to update cold room', details: error.message });
         }
     }
 
