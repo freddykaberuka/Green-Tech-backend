@@ -9,6 +9,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*.ts","src/types/custom.d.ts", "src/controllers/notificationController.ts", "src/models/notification.js", "src/routes/notificationsRoutes.ts"],
+  "include": ["src/**/*.ts", "src/controllers/notificationController.ts", "src/models/notification.js", "src/routes/notificationsRoutes.ts"],
   "exclude": ["node_modules"]
 }

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { BookingController } from '../controllers/BookingController';
+import { BookingController } from '../controllers/bookingController';
 import { authenticateJWT } from '../middleware/authMiddleware';
 
 const router = Router();
