@@ -3,14 +3,12 @@ import authRoutes from './routes/authRoutes';
 import coldroomRoutes from './routes/coldroomRoutes';
 import bookingRoutes from './routes/bookingRoutes';
 import notificationRoutes from './routes/notificationsRoutes'
-import { setupSwagger } from './swagger';
 import dotenv from 'dotenv';
 import cors from "cors";
 
 dotenv.config();
 
 const app = express();
-setupSwagger(app);
 
 app.use(express.json());
 app.use(cors({

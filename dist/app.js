@@ -8,12 +8,10 @@ const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 const coldroomRoutes_1 = __importDefault(require("./routes/coldroomRoutes"));
 const bookingRoutes_1 = __importDefault(require("./routes/bookingRoutes"));
 const notificationsRoutes_1 = __importDefault(require("./routes/notificationsRoutes"));
-const swagger_1 = require("./swagger");
 const dotenv_1 = __importDefault(require("dotenv"));
 const cors_1 = __importDefault(require("cors"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-(0, swagger_1.setupSwagger)(app);
 app.use(express_1.default.json());
 app.use((0, cors_1.default)({
     origin: process.env.CLIENT_URL || 'http://localhost:3000',
