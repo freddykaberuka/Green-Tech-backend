@@ -6,7 +6,6 @@ import { generateToken } from '../utils/jwt';
 function isError(error: unknown): error is Error {
   return error instanceof Error;
 }
-
 export const registerUser = async (req: Request, res: Response) => {
   const { names, email, password, role } = req.body;
   try {
@@ -41,9 +40,7 @@ export const loginUser = async (req: Request, res: Response) => {
       res.status(400).send({ error: 'Unknown error occurred' });
     }
   }
-};
-
-
+  };
   export const requestPasswordResetController = async (req: Request, res: Response) => {
     const { email } = req.body;
   
