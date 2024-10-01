@@ -17,6 +17,8 @@ app.use(cors({
     allowedHeaders: 'Content-Type,Authorization'
   }));
 
+app.use('/',(req, res)=>{
+  res.send("Welcome To Green Energy Tech")});
 app.use('/api/auth', authRoutes);
 app.use('/coldroom', coldroomRoutes)
 app.use('/book', bookingRoutes)
