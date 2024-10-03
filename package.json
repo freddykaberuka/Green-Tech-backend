@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "cross-env NODE_OPTIONS='--max-old-space-size=512' node dist/index.js",
-    "dev": "cross-env NODE_OPTIONS='--max-old-space-size=2048' ts-node src/index.ts",
+    "dev": "cross-env NODE_OPTIONS='--max-old-space-size=2048' nodemon --exec ts-node src/index.ts",
     "build": "tsc",
     "heroku-postbuild": "npm run build"
   },

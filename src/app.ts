@@ -3,6 +3,7 @@ import authRoutes from './routes/authRoutes';
 import coldroomRoutes from './routes/coldroomRoutes';
 import bookingRoutes from './routes/bookingRoutes';
 import notificationRoutes from './routes/notificationsRoutes'
+import contactRoutes from './routes/contactRoutes'
 import dotenv from 'dotenv';
 import cors from "cors";
 
@@ -21,6 +22,7 @@ app.use('/api/auth', authRoutes);
 app.use('/coldroom', coldroomRoutes)
 app.use('/book', bookingRoutes)
 app.use('/notifications', notificationRoutes)
+app.use('/contact', contactRoutes)
 
 
 export default app;
