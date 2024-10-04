@@ -15,16 +15,21 @@ export interface Booking {
 
 // Create a booking
 export const createBooking = async (booking: Booking): Promise<number> => {
-  const query = `INSERT INTO bookings (userId, coldRoomId, status, requestedAt, startDate, endDate) VALUES (?, ?, ?, ?, ?,?)`;
-  const [result] = await pool.execute<ResultSetHeader>(query, [
-    booking.userId,
-    booking.coldRoomId,
-    booking.status,
-    booking.requestedAt,
-    booking.startDate,
-    booking.endDate
-  ]);
-  return result.insertId;
+  try {
+    const query = `INSERT INTO bookings (userId, coldRoomId, status, requestedAt, startDate, endDate) VALUES (?, ?, ?, ?, ?, ?)`;
+    const [result] = await pool.execute<ResultSetHeader>(query, [
+      booking.userId,
+      booking.coldRoomId,
+      booking.status,
+      booking.requestedAt,
+      booking.startDate,
+      booking.endDate
+    ]);
+    return result.insertId;
+  } catch (error) {
+    console.error("Error creating booking:", error);
+    throw new Error("Database error: Could not create booking.");
+  }
 };
 
 // Update booking status

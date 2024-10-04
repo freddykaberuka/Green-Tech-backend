@@ -1,6 +1,14 @@
 import { Booking, createBooking, updateBookingStatus, getBookingsByUserId, getBookingById, cancelBooking, getAllBookings, getPendingBookings, checkDateAvailability } from '../models/Booking';
 
 export class BookingService {
+  async isDateAvailable(coldRoomId: number, startDate: Date, endDate: Date): Promise<boolean> {
+    try {
+      return await checkDateAvailability(coldRoomId, startDate, endDate);
+    } catch (error) {
+      console.error("Error checking date availability:", error);
+      throw new Error("Database error: Could not check date availability.");
+    }
+  }
   async requestBooking(userId: number, coldRoomId: number, startDate: Date, endDate: Date): Promise<number> {
     console.log('Requested Dates:', { startDate, endDate });
     const bookingId = await createBooking({
