@@ -13,6 +13,8 @@ const pool = promise_1.default.createPool({
     database: process.env.DB_NAME,
     waitForConnections: true,
     connectionLimit: 10,
-    queueLimit: 0
+    queueLimit: 0,
+    port: 3306,
+    connectTimeout: 10000
 });
 exports.default = pool;

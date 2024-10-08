@@ -36,6 +36,7 @@ const createTransporter = async () => {
             refreshToken: process.env.REFRESH_TOKEN,
             accessToken: accessToken.token,
         },
+        // debug: true, // Uncomment to enable debug output
     });
     return transporter;
 };
@@ -53,7 +54,7 @@ const sendResetEmail = async (email, resetToken) => {
     }
     catch (error) {
         console.error('Error sending email:', error);
-        throw error;
+        throw error; // You might want to handle this differently in a production app
     }
 };
 exports.sendResetEmail = sendResetEmail;

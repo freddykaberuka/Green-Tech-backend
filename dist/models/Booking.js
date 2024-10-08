@@ -7,16 +7,22 @@ exports.checkDateAvailability = exports.getPendingBookings = exports.getAllBooki
 const db_1 = __importDefault(require("../config/db"));
 // Create a booking
 const createBooking = async (booking) => {
-    const query = `INSERT INTO bookings (userId, coldRoomId, status, requestedAt, startDate, endDate) VALUES (?, ?, ?, ?, ?,?)`;
-    const [result] = await db_1.default.execute(query, [
-        booking.userId,
-        booking.coldRoomId,
-        booking.status,
-        booking.requestedAt,
-        booking.startDate,
-        booking.endDate
-    ]);
-    return result.insertId;
+    try {
+        const query = `INSERT INTO bookings (userId, coldRoomId, status, requestedAt, startDate, endDate) VALUES (?, ?, ?, ?, ?, ?)`;
+        const [result] = await db_1.default.execute(query, [
+            booking.userId,
+            booking.coldRoomId,
+            booking.status,
+            booking.requestedAt,
+            booking.startDate,
+            booking.endDate
+        ]);
+        return result.insertId;
+    }
+    catch (error) {
+        console.error("Error creating booking:", error);
+        throw new Error("Database error: Could not create booking.");
+    }
 };
 exports.createBooking = createBooking;
 // Update booking status

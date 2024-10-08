@@ -3,6 +3,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BookingService = void 0;
 const Booking_1 = require("../models/Booking");
 class BookingService {
+    async isDateAvailable(coldRoomId, startDate, endDate) {
+        try {
+            return await (0, Booking_1.checkDateAvailability)(coldRoomId, startDate, endDate);
+        }
+        catch (error) {
+            console.error("Error checking date availability:", error);
+            throw new Error("Database error: Could not check date availability.");
+        }
+    }
     async requestBooking(userId, coldRoomId, startDate, endDate) {
         console.log('Requested Dates:', { startDate, endDate });
         const bookingId = await (0, Booking_1.createBooking)({
