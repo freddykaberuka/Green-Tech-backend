@@ -6,26 +6,27 @@ const coldRoomService = new ColdRoomService();
 export class ColdRoomController {
     async createColdRoom(req: Request, res: Response) {
         try {
-            const imageUrl = req.file?.path;
-            
+            const imageUrl = req.file?.path || undefined;  // If no file, set imageUrl to undefined
+    
             const coldRoomData = {
                 ...req.body,
-                image: imageUrl
+                image: imageUrl // If no imageUrl, it will be undefined
             };
-
+    
             const coldRoomId = await coldRoomService.createColdRoom(coldRoomData);
             const newColdRoom = await coldRoomService.getColdRoomById(coldRoomId);
-
+    
             if (!newColdRoom) {
                 return res.status(404).json({ error: 'Cold room not found after creation' });
             }
-
+    
             res.status(201).json(newColdRoom);
         } catch (error: any) {
             console.error('Error creating cold room:', error.message);
             res.status(500).json({ error: 'Failed to create cold room', details: error.message });
         }
     }
+    
 
     async getColdRooms(req: Request, res: Response) {
         try {

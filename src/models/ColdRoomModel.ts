@@ -14,20 +14,27 @@ export interface ColdRoom {
 }
 
 export const createColdRoom = async (coldRoom: ColdRoom): Promise<number> => {
-    const query = `INSERT INTO cold_rooms (name, price, location, capacity, unit, status, size, feature, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-    const [result] = await pool.execute(query, [
-        coldRoom.name,
-        coldRoom.price,
-        coldRoom.location,
-        coldRoom.capacity,
-        coldRoom.unit,
-        coldRoom.status,
-        coldRoom.size,
-        JSON.stringify(coldRoom.feature),
-        coldRoom.image
-    ]);
+    let query = `INSERT INTO cold_rooms (name, price, location, capacity, unit, status, size, feature`;
+    let values = [coldRoom.name, coldRoom.price, coldRoom.location, coldRoom.capacity, coldRoom.unit, coldRoom.status, coldRoom.size, JSON.stringify(coldRoom.feature)];
+
+    // Only include the image field if it's provided
+    if (coldRoom.image) {
+        query += `, image`;
+        values.push(coldRoom.image);
+    }
+
+    query += `) VALUES (?, ?, ?, ?, ?, ?, ?, ?`;
+
+    if (coldRoom.image) {
+        query += `, ?`;
+    }
+
+    query += `)`;
+
+    const [result] = await pool.execute(query, values);
     return (result as any).insertId;
 };
+
 
 export const getColdRooms = async (): Promise<ColdRoom[]> => {
     const [rows] = await pool.query('SELECT * FROM cold_rooms');
