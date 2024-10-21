@@ -11,26 +11,32 @@ export interface ColdRoom {
     size: string;
     feature: string[];
     image?: string;
+    roomType: string;
 }
 
 export const createColdRoom = async (coldRoom: ColdRoom): Promise<number> => {
-    let query = `INSERT INTO cold_rooms (name, price, location, capacity, unit, status, size, feature`;
-    let values = [coldRoom.name, coldRoom.price, coldRoom.location, coldRoom.capacity, coldRoom.unit, coldRoom.status, coldRoom.size, JSON.stringify(coldRoom.feature)];
+    // Base query for columns
+    let query = `INSERT INTO cold_rooms (name, price, location, capacity, unit, status, size, feature, roomType`;
+    let values = [coldRoom.name, coldRoom.price, coldRoom.location, coldRoom.capacity, coldRoom.unit, coldRoom.status, coldRoom.size, JSON.stringify(coldRoom.feature), coldRoom.roomType];
 
-    // Only include the image field if it's provided
+    // Add image column if the image is provided
     if (coldRoom.image) {
         query += `, image`;
-        values.push(coldRoom.image);
     }
 
-    query += `) VALUES (?, ?, ?, ?, ?, ?, ?, ?`;
+    // Complete the query by closing the column part and adding placeholders for the values
+    query += `) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?`;
 
+    // Add placeholder for image if it exists
     if (coldRoom.image) {
         query += `, ?`;
+        values.push(coldRoom.image); // Add the image value to the values array
     }
 
+    // Close the values part
     query += `)`;
 
+    // Execute the query with the values array
     const [result] = await pool.execute(query, values);
     return (result as any).insertId;
 };
@@ -38,7 +44,7 @@ export const createColdRoom = async (coldRoom: ColdRoom): Promise<number> => {
 
 export const getColdRooms = async (): Promise<ColdRoom[]> => {
     const [rows] = await pool.query('SELECT * FROM cold_rooms');
-    
+
     if (!Array.isArray(rows)) {
         throw new Error("Expected an array of rows from the database");
     }
@@ -46,26 +52,14 @@ export const getColdRooms = async (): Promise<ColdRoom[]> => {
     return rows.map((row: any) => ({
         ...row,
         feature: parseFeature(row.feature),
+        roomType: row.roomType,
     })) as ColdRoom[];
-};
-
-// Helper function to safely parse the feature field
-const parseFeature = (feature: string | null): string[] => {
-    if (!feature) {
-        return [];
-    }
-    try {
-        return JSON.parse(feature);
-    } catch (error) {
-        console.error('Error parsing feature:', feature, error);
-        return [];
-    }
 };
 
 export const getColdRoomById = async (id: number): Promise<ColdRoom | null> => {
     const [rows] = await pool.query('SELECT * FROM cold_rooms WHERE id = ?', [id]);
     const coldRooms = rows as ColdRoom[];
-    
+
     if (coldRooms.length === 0) {
         return null;
     }
@@ -118,6 +112,10 @@ export const updateColdRoom = async (id: number, coldRoom: Partial<ColdRoom>): P
         fields.push('image = ?');
         values.push(coldRoom.image);
     }
+    if (coldRoom.roomType !== undefined) {
+        fields.push('roomType = ?'); // Add roomType to update query
+        values.push(coldRoom.roomType);
+    }
 
     values.push(id);
     if (fields.length === 0) {
@@ -128,6 +126,20 @@ export const updateColdRoom = async (id: number, coldRoom: Partial<ColdRoom>): P
     await pool.execute(query, values);
 };
 
+// Reintroduce the deleteColdRoom function
 export const deleteColdRoom = async (id: number): Promise<void> => {
     await pool.execute('DELETE FROM cold_rooms WHERE id = ?', [id]);
+};
+
+// Helper function to safely parse the feature field
+const parseFeature = (feature: string | null): string[] => {
+    if (!feature) {
+        return [];
+    }
+    try {
+        return JSON.parse(feature);
+    } catch (error) {
+        console.error('Error parsing feature:', feature, error);
+        return [];
+    }
 };

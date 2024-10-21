@@ -6,11 +6,12 @@ const coldRoomService = new ColdRoomService();
 export class ColdRoomController {
     async createColdRoom(req: Request, res: Response) {
         try {
-            const imageUrl = req.file?.path || undefined;  // If no file, set imageUrl to undefined
+            const imageUrl = req.file?.path || undefined;
     
             const coldRoomData = {
                 ...req.body,
-                image: imageUrl // If no imageUrl, it will be undefined
+                image: imageUrl,
+                roomType: req.body.roomType
             };
     
             const coldRoomId = await coldRoomService.createColdRoom(coldRoomData);
@@ -56,7 +57,8 @@ export class ColdRoomController {
             
             const coldRoomData = {
                 ...req.body,
-                image: imageUrl || req.body.image // Keep the old image URL if no new image is uploaded
+                image: imageUrl || req.body.image,
+                roomType: req.body.roomType
             };
 
             await coldRoomService.updateColdRoom(coldRoomId, coldRoomData);
