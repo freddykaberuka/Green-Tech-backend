@@ -6,12 +6,20 @@ import { createNotificationController } from './notificationController';
 const bookingService = new BookingService();
 
 export class BookingController {
-async requestBooking(req: CustomRequest, res: Response) {
+  async requestBooking(req: CustomRequest, res: Response) {
     try {
-      const { coldRoomId, startDate, endDate } = req.body;
+      const { coldRoomId, startDate, endDate, totalPrice } = req.body;
       const userId = req.user?.userId;
   
+      // Log the received payload to check if totalPrice is being sent
+      console.log("Received Payload:", req.body);
+  
       if (!userId) return res.status(403).json({ message: 'Unauthorized, user ID missing' });
+  
+      // Validate totalPrice
+      if (totalPrice === undefined || totalPrice === null) {
+        return res.status(400).json({ message: 'Total price is required' });
+      }
   
       // Parse the startDate and endDate to Date objects
       const start = new Date(startDate);
@@ -22,50 +30,18 @@ async requestBooking(req: CustomRequest, res: Response) {
         return res.status(400).json({ message: 'Invalid date format' });
       }
   
-      console.log('Requested Dates:', { startDate: start.toISOString(), endDate: end.toISOString() });
+      console.log('Requested Dates:', { startDate: start.toISOString(), endDate: end.toISOString(), totalPrice });
   
-      const bookingId = await bookingService.requestBooking(userId, coldRoomId, start, end);
-      const options: Intl.DateTimeFormatOptions = {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-    };
-    
-    const readableStart = start.toLocaleString('en-US', options);
-    const readableEnd = end.toLocaleString('en-US', options);
-      const notificationData = {
-        title: 'Booking Confirmed',
-        description: `Your booking for Cold Room ID ${coldRoomId} from ${readableStart} to ${readableEnd} has been confirmed.`,
-        url: `/bookings/${bookingId}`, // Link to the booking details page
-        userId,
-      };
+      const bookingId = await bookingService.requestBooking(userId, coldRoomId, start, end, totalPrice);
   
-      // Create mock request and response objects
-      const mockReq = {
-        body: notificationData,
-      } as Request;
-  
-      const mockRes = {
-        status: (code: number) => {
-          return {
-            send: (responseBody: any) => {
-              // You can log or handle the response if needed
-              console.log(`Response Status: ${code}`, responseBody);
-            },
-          };
-        },
-      } as Response;
-  
-      // Call the existing notification controller
-      await createNotificationController(mockReq, mockRes);
       res.status(201).json({ message: 'Booking request submitted', id: bookingId });
     } catch (error) {
-      console.error('Error submitting booking request:', error); // Log the error
+      console.error('Error submitting booking request:', error);
       res.status(500).json({ error: 'Failed to submit booking request' });
     }
   }
+  
+
 
   
   
@@ -84,7 +60,7 @@ async requestBooking(req: CustomRequest, res: Response) {
 
   async getUserBookings(req: CustomRequest, res: Response) {
     try {
-      const userId = req.user?.userId;  // Access userId instead of id
+      const userId = req.user?.userId;
       if (!userId) return res.status(403).json({ message: 'Unauthorized, user ID missing' });
 
       const bookings = await bookingService.getUserBookings(userId);
@@ -101,7 +77,7 @@ async requestBooking(req: CustomRequest, res: Response) {
       const bookings = await bookingService.getAllBookings();
       res.status(200).json(bookings);
     } catch (error) {
-      console.error('Error retrieving all bookings:', error); // Log the error
+      console.error('Error retrieving all bookings:', error);
       res.status(500).json({ error: 'Failed to retrieve bookings' });
     }
   }
@@ -127,7 +103,7 @@ async requestBooking(req: CustomRequest, res: Response) {
   
       res.status(200).json(booking);
     } catch (error) {
-      console.error('Error retrieving booking details:', error); // Log the error
+      console.error('Error retrieving booking details:', error);
       res.status(500).json({ error: 'Failed to retrieve booking details' });
     }
   }
@@ -149,7 +125,7 @@ async requestBooking(req: CustomRequest, res: Response) {
       await bookingService.cancelBooking(Number(id));
       res.status(200).json({ message: 'Booking cancelled successfully' });
     } catch (error) {
-      console.error('Error cancelling booking:', error); // Log the error
+      console.error('Error cancelling booking:', error);
       res.status(500).json({ error: 'Failed to cancel booking' });
     }
   }

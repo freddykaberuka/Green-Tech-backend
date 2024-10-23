@@ -10,20 +10,26 @@ export interface Booking {
   requestedAt: Date;
   approvedAt?: Date;
   startDate: Date;
-  endDate: Date; 
+  endDate: Date;
+  totalPrice?: number;
 }
 
 // Create a booking
 export const createBooking = async (booking: Booking): Promise<number> => {
   try {
-    const query = `INSERT INTO bookings (userId, coldRoomId, status, requestedAt, startDate, endDate) VALUES (?, ?, ?, ?, ?, ?)`;
+    const query = `
+      INSERT INTO bookings 
+      (userId, coldRoomId, status, requestedAt, startDate, endDate, totalPrice) 
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
     const [result] = await pool.execute<ResultSetHeader>(query, [
       booking.userId,
       booking.coldRoomId,
       booking.status,
       booking.requestedAt,
       booking.startDate,
-      booking.endDate
+      booking.endDate,
+      booking.totalPrice
     ]);
     return result.insertId;
   } catch (error) {

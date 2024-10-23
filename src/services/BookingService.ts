@@ -9,8 +9,9 @@ export class BookingService {
       throw new Error("Database error: Could not check date availability.");
     }
   }
-  async requestBooking(userId: number, coldRoomId: number, startDate: Date, endDate: Date): Promise<number> {
-    console.log('Requested Dates:', { startDate, endDate });
+  async requestBooking(userId: number, coldRoomId: number, startDate: Date, endDate: Date, totalPrice: number): Promise<number> {
+    console.log('Requested Dates:', { startDate, endDate, totalPrice });
+    
     const bookingId = await createBooking({
       userId,
       coldRoomId,
@@ -18,9 +19,11 @@ export class BookingService {
       requestedAt: new Date(),
       startDate,
       endDate,
+      totalPrice,
     });
     return bookingId;
   }
+
 
   async approveBooking(id: number, status: 'approved' | 'rejected') {
     await updateBookingStatus(id, status);
