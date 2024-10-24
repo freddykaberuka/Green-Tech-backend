@@ -1,3 +1,4 @@
+import { sendEmail } from './emailService';
 import { Booking, createBooking, updateBookingStatus, getBookingsByUserId, getBookingById, cancelBooking, getAllBookings, getPendingBookings, checkDateAvailability } from '../models/Booking';
 
 export class BookingService {
@@ -27,7 +28,25 @@ export class BookingService {
 
   async approveBooking(id: number, status: 'approved' | 'rejected') {
     await updateBookingStatus(id, status);
+
+    // Send email if booking is approved
+    if (status === 'approved') {
+      const booking = await getBookingById(id);
+      if (booking) {
+        const subject = 'Your Storage Booking has been Approved';
+        const message = `
+          Hi ${booking.userName},
+
+          Your booking for the Storage from ${new Date(booking.startDate).toLocaleDateString()} 
+          to ${new Date(booking.endDate).toLocaleDateString()} has been approved.
+
+          Thank you for choosing our service!
+        `;
+        await sendEmail(booking.userEmail, subject, message);
+      }
+    }
   }
+
 
   async getUserBookings(userId: number): Promise<Booking[]> {
     return getBookingsByUserId(userId);

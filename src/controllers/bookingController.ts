@@ -50,7 +50,6 @@ export class BookingController {
     try {
       const { id, status } = req.body;
       if (req.user?.role !== 'admin') return res.status(403).json({ message: 'Forbidden, admin access required' });
-
       await bookingService.approveBooking(id, status);
       res.status(200).json({ message: `Booking status updated to ${status}` });
     } catch (error) {

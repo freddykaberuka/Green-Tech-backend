@@ -52,11 +52,20 @@ export const getBookingsByUserId = async (userId: number): Promise<Booking[]> =>
 };
 
 // Get booking by ID
-export const getBookingById = async (id: number): Promise<Booking | null> => {
-  const query = `SELECT * FROM bookings WHERE id = ?`;
+export const getBookingById = async (id: number): Promise<any | null> => {
+  const query = `
+    SELECT 
+      bookings.*, 
+      users.email AS userEmail, 
+      users.names AS userName 
+    FROM bookings 
+    JOIN users ON bookings.userId = users.id 
+    WHERE bookings.id = ?
+  `;
   const [rows] = await pool.query<RowDataPacket[]>(query, [id]);
-  return (rows as Booking[])[0] || null;
+  return (rows as any[])[0] || null;
 };
+
 
 // Cancel booking
 export const cancelBooking = async (id: number): Promise<void> => {
